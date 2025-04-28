@@ -1,46 +1,41 @@
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.*;
 
 public class Main {
 
-	static int stair[];
-	static Integer memorial[];
-	
+    static int stair[];
+    static int memorial[];
+
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
         int num = Integer.parseInt(br.readLine());
-        
+
         stair = new int[num];
-        memorial = new Integer[num];
-        
+        memorial = new int[num];
+
         for(int i = 0; i < num ; i++) {
-        	stair[i] = Integer.parseInt(br.readLine());
+            stair[i] = Integer.parseInt(br.readLine());
         }
-        
+
         memorial[0] = stair[0];
-        
-        if(num > 1) {
-        	memorial[1] = stair[1] + stair[0];
-        	if(num > 2) {
-        		memorial[2] = stair[2] + Math.max(stair[0], stair[1]);
-        	}
-        }
-        
+        if(num > 1) memorial[1] = stair[0] + stair[1];
+        if(num > 2) memorial[2] = Math.max(stair[0], stair[1]) + stair[2];
 
-        System.out.println( ac_num(num - 1));
-        
-	}
-    
-    static int ac_num(int n) {
+        bw.write(memorial(num - 1) + "");
 
-    	if(memorial[n] == null) {
-    		memorial[n] = Math.max(ac_num(n - 2), ac_num(n - 3) + stair[n - 1]) + stair[n];
-    	}
-    	
-    	return	memorial[n];
+        bw.flush();
+        bw.close();
     }
+
+    static int memorial(int idx){
+        if(memorial[idx] == 0){
+            return memorial[idx] = Math.max(memorial(idx - 2), memorial(idx - 3) + stair[idx - 1]) + stair[idx];
+        }
+
+        return memorial[idx];
+    }
+
 }
