@@ -1,4 +1,3 @@
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.io.*;
 import java.util.*;
 
@@ -75,20 +74,6 @@ public class Main {
 
             }
         } //점화식
-
-//        for(int i = 0 ; i < min_cost.length; i++){
-//            for(int j = 0 ; j < min_cost[i].length; j++){
-//                bw.write(max_cost[i][j] + " ");
-//            }bw.write("\n");
-//        }
-//        bw.write("\n");
-//
-//        for(int i = 0 ; i < min_cost.length; i++){
-//            for(int j = 0 ; j < min_cost[i].length; j++){
-//                bw.write(min_cost[i][j] + " ");
-//            }bw.write("\n");
-//        }
-
 
         int M = Integer.parseInt(br.readLine());
 
