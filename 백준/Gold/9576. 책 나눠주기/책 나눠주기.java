@@ -51,17 +51,16 @@ public class Main {
                 Arrays.fill(check, false);
 
                 dfs(i);
-
-                int tmp = 0;
-                for(int j = 0 ; j < N; j++){
-                    if(arr[j] != -1){
-                        tmp += 1;
-                    }
-                }
-
-                cnt = Math.max(tmp, cnt);
-
             }
+            
+            int cnt = 0;
+            for(int j = 0 ; j < N; j++){
+                 if(arr[j] != -1){
+                        cnt += 1;
+                 }
+             }
+
+                
 
             sb.append(cnt + "\n");
 
