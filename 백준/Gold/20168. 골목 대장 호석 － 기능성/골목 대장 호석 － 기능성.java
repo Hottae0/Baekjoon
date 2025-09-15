@@ -56,9 +56,10 @@ public class Main {
 
     static long Dijkstra(int start, int end){
 
-        long arr[] = new long[N];
-        Arrays.fill(arr, Long.MAX_VALUE);
-        arr[0] = 0;
+        long arr[][] = new long[N][2]; //[0] = 최소 최대 가격, [1] = 지금까지의 합
+        for(int i = 0 ; i < N; i++){
+            Arrays.fill(arr[i], Long.MAX_VALUE);
+        }
 
         PriorityQueue<info> que = new PriorityQueue<>(new Comparator<info>() {
             @Override
@@ -73,26 +74,30 @@ public class Main {
             info io = que.poll();
 
             int from = io.u;
-            long sum = io.cost;
-            long max = io.max;
+            long now_sum = io.cost;
+            long now_max = io.max;
 
-            if(sum > C) continue;
+            if(now_max > arr[from][0] || (now_sum > arr[from][1] && now_max == arr[from][0])) continue;
 
             for(info next : graph[from]){
                 int to = next.u;
-                long cost = next.cost;
+                long edge_cost = next.cost;
 
-                max = Math.max(max, cost);
+                long new_max = Math.max(io.max, edge_cost);
 
-                if(arr[to] > max && sum + cost <= C){
-                    arr[to] = max;
-                    que.add(new info(to, sum + cost, max));
+                long new_sum = io.cost + edge_cost;
+                if(new_sum > C) continue;
+
+                if(arr[to][0] > new_max ||(new_max == arr[to][0] && new_sum < arr[to][1])){
+                    arr[to][0] = new_max;
+                    arr[to][1] = new_sum;
+                    que.add(new info(to, new_sum, new_max));
                 }
             }
 
         }
 
-        return arr[end];
+        return arr[end][0];
     }
 
 }
