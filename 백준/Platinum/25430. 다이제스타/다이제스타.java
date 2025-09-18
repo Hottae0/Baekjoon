@@ -1,127 +1,78 @@
 import java.io.*;
 import java.util.*;
 
-//25430 다이제스타
-class Node implements Comparable<Node>{
-    int i;
-    long cost;
-
-    Node(int i, long cost){
-        this.i = i;
-        this.cost = cost;
-    }
-
-    @Override
-    public int compareTo(Node nd) {
-        return Long.compare(this.cost, nd.cost);
-    }
-}
-
-class info{
-    int i;
-    long previous;
-    long cost;
-
-    info(int i, long cost, long previous){
-        this.i = i;
-        this.cost = cost;
-        this.previous = previous;
-    }
-
-}
-
 public class Main {
-    static ArrayList<Node> arr[];
+    static final long INF = Long.MAX_VALUE;
 
-    static int N, M;
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-
         StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
 
-        arr = new ArrayList[N];
-        for(int i = 0 ; i < N; i++){
-            arr[i] = new ArrayList<>();
-        }
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
 
-        for(int i = 0; i < M; i++){
+        // Key(가중치)를 기준으로 자동 정렬되는 TreeMap 사용
+        TreeMap<Integer, ArrayList<int[]>> edgesByWeight = new TreeMap<>();
+
+        for (int i = 0; i < M; i++) {
             st = new StringTokenizer(br.readLine());
+            int u = Integer.parseInt(st.nextToken());
+            int v = Integer.parseInt(st.nextToken());
+            int c = Integer.parseInt(st.nextToken());
 
-            int a = Integer.parseInt(st.nextToken()) - 1;
-            int b = Integer.parseInt(st.nextToken()) - 1;
-            long c = Long.parseLong(st.nextToken());
-
-            arr[a].add(new Node(b, c));
-            arr[b].add(new Node(a, c));
+            // 가중치 c를 Key로 하여 간선 (u, v)를 저장
+            edgesByWeight.computeIfAbsent(c, k -> new ArrayList<>()).add(new int[]{u, v});
         }
 
         st = new StringTokenizer(br.readLine());
+        int startNode = Integer.parseInt(st.nextToken());
+        int endNode = Integer.parseInt(st.nextToken());
 
-        int start = Integer.parseInt(st.nextToken()) - 1;
-        int end = Integer.parseInt(st.nextToken()) - 1;
+        // DP 테이블
+        long[] D = new long[N + 1]; // 메인 DP 테이블
+        long[] T = new long[N + 1]; // 임시 DP 테이블
+        Arrays.fill(D, INF);
+        Arrays.fill(T, INF);
 
-        long ans = Dijkstra(start, end); // 거꾸로 하는 게 나을듯?
+        // 시작점 초기화
+        D[startNode] = 0;
 
-        if(ans == Long.MAX_VALUE){
-            bw.write("DIGESTA");
-        }else{
-            bw.write(ans + "");
-        }
+        // 가중치가 작은 순서대로 순회
+        for (int weight : edgesByWeight.keySet()) {
+            ArrayList<int[]> edges = edgesByWeight.get(weight);
 
-        bw.flush();
-        bw.close();
-    }
-
-    static long Dijkstra(int start, int end){
-        if(start == end) return 0;
-        
-        Map<Long, Long>[] dis = new HashMap[N]; // key : 직전 값 , value : 해당 노드까지 총 cost
-        for(int i = 0 ; i < N; i++){
-            dis[i] = new HashMap<>();
-        }
-
-        PriorityQueue<info> que = new PriorityQueue<>(new Comparator<info>() {
-            @Override
-            public int compare(info o1, info o2) {
-                return Long.compare(o1.cost, o2.cost);
-            }
-        });
-
-        que.add(new info(start, 0, 0));
-
-        while(!que.isEmpty()){
-            info io = que.poll();
-
-            int from = io.i;
-            long sum = io.cost;
-            long previous = io.previous;
-
-            for(Node nd : arr[from]){
-                int to = nd.i;
-                long cost = nd.cost;
-
-                if(previous < cost){ // 직전 값보다 큼.
-
-                    if(sum + cost < dis[to].getOrDefault(cost, Long.MAX_VALUE)){
-                        dis[to].put(cost, sum + cost);
-                        que.add(new info(to, sum + cost, cost));
-                    }
+            // 1. 경로 후보 계산 (Relaxation) -> 임시 테이블 T에 저장
+            for (int[] edge : edges) {
+                int u = edge[0];
+                int v = edge[1];
+                
+                // D[v]가 INF가 아니라는 것은 v까지 경로가 존재한다는 의미
+                if (D[v] != INF) {
+                    T[u] = Math.min(T[u], D[v] + weight);
                 }
-
+                if (D[u] != INF) {
+                    T[v] = Math.min(T[v], D[u] + weight);
+                }
             }
-
+            
+            // 2. DP 테이블 최종 갱신 -> T의 결과를 D에 반영
+            for (int[] edge : edges) {
+                int u = edge[0];
+                int v = edge[1];
+                
+                D[u] = Math.min(D[u], T[u]);
+                D[v] = Math.min(D[v], T[v]);
+                // T는 다음 가중치 계산을 위해 초기화 (선택적: 어차피 min으로 갱신되므로 생략 가능)
+                // T[u] = INF; 
+                // T[v] = INF;
+            }
         }
 
-        long ans = Long.MAX_VALUE;
-        if(!dis[end].isEmpty()){
-            for(long val : dis[end].values()){
-                ans = Math.min(ans, val);
-            }
+        if (D[endNode] == INF) {
+            System.out.println("DIGESTA");
+        } else {
+            System.out.println(D[endNode]);
         }
-
-        return ans;
     }
 }
+
