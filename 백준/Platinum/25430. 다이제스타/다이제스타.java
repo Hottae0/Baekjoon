@@ -58,10 +58,6 @@ public class Main {
             arr[b].add(new Node(a, c));
         }
 
-        for(int i = 0 ; i < N; i++){
-            Collections.sort(arr[i]);
-        }
-
         st = new StringTokenizer(br.readLine());
 
         int start = Integer.parseInt(st.nextToken()) - 1;
@@ -80,6 +76,8 @@ public class Main {
     }
 
     static long Dijkstra(int start, int end){
+        if(start == end) return 0;
+        
         Map<Long, Long>[] dis = new HashMap[N]; // key : 직전 값 , value : 해당 노드까지 총 cost
         for(int i = 0 ; i < N; i++){
             dis[i] = new HashMap<>();
@@ -101,12 +99,12 @@ public class Main {
             long sum = io.cost;
             long previous = io.previous;
 
-
             for(Node nd : arr[from]){
                 int to = nd.i;
                 long cost = nd.cost;
 
-                if(previous < cost){
+                if(previous < cost){ // 직전 값보다 큼.
+
                     if(sum + cost < dis[to].getOrDefault(cost, Long.MAX_VALUE)){
                         dis[to].put(cost, sum + cost);
                         que.add(new info(to, sum + cost, cost));
