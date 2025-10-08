@@ -50,16 +50,13 @@ public class Main {
 
             long maxPrevLis = 0;
             if (now > 0) {
-                // 여기서 find 함수를 사용합니다!
                 maxPrevLis = find(1, 0, map.size() - 1, 0, now - 1);
             }
 
             long currentLis = maxPrevLis + 1;
 
-            // 3. Update: 계산된 길이를 세그먼트 트리에 기록 (update 함수 필요)
             update(1, 0, map.size() - 1, now, currentLis);
-
-
+            
             max_Length = Math.max(max_Length, currentLis);
         }
 
