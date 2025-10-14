@@ -1,50 +1,36 @@
-# scraper.py
+# scraper.py (API version)
 
 import requests
-from bs4 import BeautifulSoup
-import pandas as pd
 import time
 import os
 
 # ------------------- 설정 ------------------- #
-# ❗ 본인의 백준 아이디로 변경하세요
-BAEKJOON_ID = "hottae00311"
+SOLVEDAC_ID = "hottae00311"
 TARGET_FILE = "README.md"      # 업데이트할 파일명
 # ------------------------------------------- #
 
-def get_solved_problems(user_id: str):
+def get_solved_problems_from_api(user_id: str):
     """
-    백준 사이트에서 사용자가 맞은 문제 목록을 크롤링합니다.
+    Solved.ac API를 이용해 사용자가 맞은 문제 목록을 가져옵니다.
     """
-    print(f"'{user_id}'님의 맞은 문제 목록을 가져오는 중...")
-    url = f"https://www.acmicpc.net/user/{user_id}"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
-    }
-
+    print(f"'{user_id}'님의 맞은 문제 목록을 Solved.ac API에서 가져오는 중...")
+    url = f"https://solved.ac/api/v2/search/problem.json?query=solved_by:{user_id}&sort=id&direction=asc"
+    headers = {"Content-Type": "application/json"}
+    
     try:
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            print(f"❌ '{user_id}'님의 페이지를 찾을 수 없습니다. (상태 코드: {response.status_code})")
+            print(f"❌ API 요청 실패. (상태 코드: {response.status_code})")
             return None
 
-        soup = BeautifulSoup(response.text, "html.parser")
+        data = response.json()
+        problem_ids = [item['problemId'] for item in data['items']]
         
-        # '맞은 문제' 섹션을 찾습니다.
-        problem_list_div = soup.find("div", class_="problem-list")
-        if not problem_list_div:
-            print("❌ '맞은 문제' 섹션을 찾을 수 없습니다.")
-            return None
-            
-        # 문제 번호들을 모두 추출합니다.
-        problem_links = problem_list_div.find_all("a")
-        solved_list = [link.text for link in problem_links]
-        
-        print(f"✅ 총 {len(solved_list)}개의 맞은 문제를 찾았습니다.")
-        return solved_list
+        print(f"✅ 총 {len(problem_ids)}개의 맞은 문제를 API에서 찾았습니다.")
+        return problem_ids
         
     except Exception as e:
-        print(f"❌ 크롤링 중 오류 발생: {e}")
+        print(f"❌ API 처리 중 오류 발생: {e}")
         return None
 
 def update_readme(solved_list: list):
@@ -59,10 +45,13 @@ def update_readme(solved_list: list):
         with open(TARGET_FILE, 'r', encoding='utf-8') as f:
             readme_content = f.read()
 
-        # 데이터프레임을 사용해 마크다운 테이블 생성
-        df = pd.DataFrame({'푼 문제들': solved_list})
-        markdown_table = df.to_markdown(index=False)
-
+        # 마크다운 문자열 생성 (한 줄에 10개씩)
+        solved_text = ""
+        for i, problem_id in enumerate(solved_list):
+            solved_text += f"`{problem_id}` "
+            if (i + 1) % 10 == 0:
+                solved_text += "\n"
+        
         # README.md에서 주석 사이의 내용을 교체
         start_marker = ""
         end_marker = ""
@@ -76,9 +65,9 @@ def update_readme(solved_list: list):
             
         new_content = (
             readme_content[:start_index + len(start_marker)] +
-            "\n\n" +
-            markdown_table +
-            "\n\n" +
+            "\n" +
+            solved_text.strip() +
+            "\n" +
             readme_content[end_index:]
         )
 
@@ -91,6 +80,6 @@ def update_readme(solved_list: list):
         print(f"❌ 파일 업데이트 중 오류 발생: {e}")
 
 if __name__ == "__main__":
-    solved_problems = get_solved_problems(BAEKJOON_ID)
+    solved_problems = get_solved_problems_from_api(SOLVEDAC_ID)
     if solved_problems:
         update_readme(solved_problems)
