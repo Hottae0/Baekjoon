@@ -11,9 +11,6 @@ TARGET_FILE = "README.md"
 # ------------------------------------------- #
 
 def level_to_tier_image(level):
-    """
-    Solved.ac API의 레벨 번호를 티어 아이콘 이미지로 변환합니다.
-    """
     if not (0 <= level <= 30):
         return "Unrated"
     
@@ -26,13 +23,9 @@ def level_to_tier_image(level):
         "Ruby II", "Ruby I"
     ][level]
     
-    # 이미지 태그와 함께 티어 이름을 반환합니다.
     return f'<img src="https://static.solved.ac/tier_small/{level}.svg" height="16px"/> {tier_name}'
 
 def get_solved_problems_from_api(user_id: str):
-    """
-    Solved.ac API를 이용해 사용자가 맞은 문제의 상세 정보를 가져옵니다.
-    """
     print(f"'{user_id}'님의 맞은 문제 목록을 Solved.ac API에서 가져오는 중...")
     url = f"https://solved.ac/api/v3/search/problem?query=solved_by:{user_id}&sort=level&direction=desc"
     headers = {"Content-Type": "application/json"}
@@ -45,7 +38,6 @@ def get_solved_problems_from_api(user_id: str):
             return None
 
         data = response.json()
-        # 문제의 상세 정보가 담긴 'items' 리스트를 그대로 반환합니다.
         problems = data.get('items', [])
         
         print(f"✅ 총 {len(problems)}개의 맞은 문제를 API에서 찾았습니다.")
@@ -56,9 +48,6 @@ def get_solved_problems_from_api(user_id: str):
         return None
 
 def update_readme(problems: list):
-    """
-    README.md 파일의 내용을 새로운 문제 목록 표로 업데이트합니다.
-    """
     if not problems:
         print("업데이트할 문제 목록이 없습니다.")
         return
@@ -67,7 +56,6 @@ def update_readme(problems: list):
         with open(TARGET_FILE, 'r', encoding='utf-8') as f:
             readme_content = f.read()
             
-        # 상세 정보 리스트를 DataFrame으로 변환
         problem_data = {
             '번호': [p['problemId'] for p in problems],
             '제목': [p['titleKo'] for p in problems],
@@ -76,10 +64,8 @@ def update_readme(problems: list):
         }
         df = pd.DataFrame(problem_data)
         
-        # DataFrame을 마크다운 테이블로 변환
         markdown_table = df.to_markdown(index=False)
 
-        # README.md에서 주석 사이의 내용을 교체
         start_marker = ""
         end_marker = ""
 
@@ -87,7 +73,7 @@ def update_readme(problems: list):
         end_index = readme_content.find(end_marker)
 
         if start_index == -1 or end_index == -1:
-            print(f"❌ '{TARGET_FILE}'에서 마커({start_marker}, {end_marker})를 찾을 수 없습니다.")
+            print(f"❌ '{TARGET_FILE}'에서 마커({start_marker}, {end_marker})를 찾을 수 없습니다. 업데이트를 중단합니다.")
             return
             
         new_content = (
