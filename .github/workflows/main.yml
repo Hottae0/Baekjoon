@@ -1,24 +1,34 @@
-name: Update Solved.ac Readme
+name: Update Solved Problems
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 15 * * *"
-  workflow_dispatch:
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Solved.ac Readme Action
-        # 👇👇👇 현재 활성화된 Action 주소입니다. 👇👇👇
-        uses: ellynhan/solved-ac-readme-action@main
+      # 1. 내 저장소의 코드를 가져옵니다.
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # 2. Python 환경을 설정합니다.
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          # 본인의 백준 아이디를 입력하세요
-          handle: hottae00311
-          # GitHub 토큰은 자동으로 인식됩니다
-          token: ${{ secrets.GITHUB_TOKEN }}
-          # 템플릿과 결과 파일 모두 README.md로 지정
-          target_file: 'README.md'
-          # 문제 목록을 채워넣을 부분의 시작과 끝 표시
-          solved_start: ''
-          solved_end: ''
+          python-version: '3.10'
+
+      # 3. 스크립트에 필요한 라이브러리를 설치합니다.
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 pandas
+
+      # 4. 내가 만든 Python 스크립트를 실행합니다.
+      - name: Run scraper
+        run: python scraper.py
+
+      # 5. 스크립트 실행으로 변경된 README.md 파일을 저장소에 다시 커밋합니다.
+      - name: Commit and push if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "🏆 chore: Solved problem list updated"
+          file_pattern: README.md
