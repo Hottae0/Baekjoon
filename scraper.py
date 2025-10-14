@@ -3,6 +3,7 @@
 import requests
 import time
 import os
+import pandas as pd
 
 # ------------------- 설정 ------------------- #
 SOLVEDAC_ID = "hottae00311"
@@ -47,13 +48,12 @@ def update_readme(solved_list: list):
         with open(TARGET_FILE, 'r', encoding='utf-8') as f:
             readme_content = f.read()
 
-        # 마크다운 문자열 생성 (한 줄에 10개씩)
-        solved_text = ""
-        for i, problem_id in enumerate(solved_list):
-            solved_text += f"`{problem_id}` "
-            if (i + 1) % 10 == 0:
-                solved_text += "\n"
-        
+        # 푼 문제 목록을 데이터프레임으로 변환
+        df = pd.DataFrame({'Solved Problems': sorted(solved_list)})
+
+        # 데이터프레임을 마크다운 테이블로 변환
+        markdown_table = df.to_markdown(index=False)
+
         # README.md에서 주석 사이의 내용을 교체
         start_marker = ""
         end_marker = ""
@@ -64,24 +64,19 @@ def update_readme(solved_list: list):
         if start_index == -1 or end_index == -1:
             print(f"❌ '{TARGET_FILE}'에서 마커({start_marker}, {end_marker})를 찾을 수 없습니다.")
             return
-            
+
         new_content = (
             readme_content[:start_index + len(start_marker)] +
-            "\n" +
-            solved_text.strip() +
-            "\n" +
+            "\n\n" +
+            markdown_table +
+            "\n\n" +
             readme_content[end_index:]
         )
 
         with open(TARGET_FILE, 'w', encoding='utf-8') as f:
             f.write(new_content)
-            
+
         print(f"✅ '{TARGET_FILE}' 파일이 성공적으로 업데이트되었습니다.")
 
     except Exception as e:
         print(f"❌ 파일 업데이트 중 오류 발생: {e}")
-
-if __name__ == "__main__":
-    solved_problems = get_solved_problems_from_api(SOLVEDAC_ID)
-    if solved_problems:
-        update_readme(solved_problems)
