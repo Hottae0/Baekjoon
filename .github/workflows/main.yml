@@ -8,27 +8,23 @@ jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
-      # 1. 내 저장소의 코드를 가져옵니다.
       - name: Checkout
         uses: actions/checkout@v3
 
-      # 2. Python 환경을 설정합니다.
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # 3. 스크립트에 필요한 라이브러리를 설치합니다.
       - name: Install dependencies
-        run: pip install requests beautifulsoup4 pandas
+        # requests만 설치하면 됩니다.
+        run: pip install requests
 
-      # 4. 내가 만든 Python 스크립트를 실행합니다.
       - name: Run scraper
         run: python scraper.py
 
-      # 5. 스크립트 실행으로 변경된 README.md 파일을 저장소에 다시 커밋합니다.
       - name: Commit and push if changed
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "🏆 chore: Solved problem list updated"
+          commit_message: "🏆 chore: Solved problem list updated by API"
           file_pattern: README.md
