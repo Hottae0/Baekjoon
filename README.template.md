@@ -4,7 +4,7 @@
 
 ---
 
-### ✅ 푼 문제 목록 (Solved Problem List)
+### 푼 문제 목록 (Solved Problem List)
 
 | 번호 | 제목 | 티어 | 풀이 코드 |
 |:---:|:---:|:---:|:---:|
