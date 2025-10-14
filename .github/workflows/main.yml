@@ -1,26 +1,24 @@
-# .github/workflows/main.yml
-name: Auto Update Readme
+name: Update Solved.ac Readme
 on:
   schedule:
     - cron: "0 15 * * *"
   workflow_dispatch:
 
 jobs:
-  build:
+  update-readme:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: PS Stat Update
-        # 여기가 변경되었습니다!
-        uses: juhyung-p/baekjoon-stat-action@v1.0.2
+      - name: Solved.ac Readme Action
+        # 👇👇👇 현재 활성화된 Action 주소입니다. 👇👇👇
+        uses: ellynhan/solved-ac-readme-action@main
         with:
           # 본인의 백준 아이디를 입력하세요
-          user_name: hottae00311
-          
+          handle: hottae00311
+          # GitHub 토큰은 자동으로 인식됩니다
+          token: ${{ secrets.GITHUB_TOKEN }}
           # 템플릿과 결과 파일 모두 README.md로 지정
-          template_path: "README.md"
-          readme_path: "README.md"
-          
-          # 커밋 메시지
-          commit_message: "🏆 chore: Update solved problem list"
-# 최종 수정
+          target_file: 'README.md'
+          # 문제 목록을 채워넣을 부분의 시작과 끝 표시
+          solved_start: ''
+          solved_end: ''
