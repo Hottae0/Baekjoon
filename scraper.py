@@ -14,13 +14,15 @@ def get_solved_problems_from_api(user_id: str):
     Solved.ac API를 이용해 사용자가 맞은 문제 목록을 가져옵니다.
     """
     print(f"'{user_id}'님의 맞은 문제 목록을 Solved.ac API에서 가져오는 중...")
-    url = f"https://solved.ac/api/v2/search/problem.json?query=solved_by:{user_id}&sort=id&direction=asc"
+    # API 요청 주소를 가장 일반적인 형태로 수정했습니다.
+    url = f"https://solved.ac/api/v3/search/problem?query=solved_by:{user_id}&sort=level&direction=desc"
     headers = {"Content-Type": "application/json"}
     
     try:
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
             print(f"❌ API 요청 실패. (상태 코드: {response.status_code})")
+            print(f"응답 내용: {response.text}")
             return None
 
         data = response.json()
