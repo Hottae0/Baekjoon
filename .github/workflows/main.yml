@@ -1,9 +1,9 @@
-# .github/workflows/main.yml
 name: Auto Update Readme
 on:
   schedule:
     # 매일 00:00 (KST)에 실행
     - cron: "0 15 * * *"
+  # Actions 탭에서 수동으로 실행 가능하도록 설정
   workflow_dispatch:
 
 jobs:
@@ -11,9 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: PS Stat Update
         uses: mazassumnida/github-action-ps-stats@v3
         with:
           user_name: hottae00311
-          template_path: "README.template.md" # 템플릿 파일 경로
-          commit_message: "Update solved problem list" # 커밋 메시지
+
+          # 템플릿으로 사용할 파일과 업데이트할 결과 파일 모두 README.md로 지정합니다
+          template_path: "README.md"
+          readme_path: "README.md"
+          
+          # 커밋 메시지
+          commit_message: "Update solved problem list"
