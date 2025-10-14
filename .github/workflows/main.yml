@@ -16,10 +16,16 @@ jobs:
         with:
           python-version: '3.10'
 
-      # 이 부분 주의
-      - name: Install dependencies 
-        run: pip install requests pandas beautifulsoup4 tabulate
-        
+      # 👇👇👇 README.md 파일 내용을 직접 확인하는 단계를 추가했습니다 👇👇👇
+      - name: Show README.md content before running script
+        run: |
+          echo "--- Start of README.md content ---"
+          cat README.md
+          echo "--- End of README.md content ---"
+
+      - name: Install dependencies
+        run: pip install requests pandas tabulate
+
       - name: Run scraper
         run: python scraper.py
 
