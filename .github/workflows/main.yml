@@ -16,7 +16,8 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
+      # 이 부분 주의
+      - name: Install dependencies 
         run: pip install requests pandas beautifulsoup4 tabulate
         
       - name: Run scraper
