@@ -1,13 +1,14 @@
-# scraper.py (API version)
+# scraper.py
 
 import requests
+from bs4 import BeautifulSoup
+import pandas as pd  # 👈 이 부분이 있는지 확인해주세요.
 import time
 import os
-import pandas as pd
 
 # ------------------- 설정 ------------------- #
 SOLVEDAC_ID = "hottae00311"
-TARGET_FILE = "README.md"      # 업데이트할 파일명
+TARGET_FILE = "README.md"
 # ------------------------------------------- #
 
 def get_solved_problems_from_api(user_id: str):
@@ -15,7 +16,6 @@ def get_solved_problems_from_api(user_id: str):
     Solved.ac API를 이용해 사용자가 맞은 문제 목록을 가져옵니다.
     """
     print(f"'{user_id}'님의 맞은 문제 목록을 Solved.ac API에서 가져오는 중...")
-    # API 요청 주소를 가장 일반적인 형태로 수정했습니다.
     url = f"https://solved.ac/api/v3/search/problem?query=solved_by:{user_id}&sort=level&direction=desc"
     headers = {"Content-Type": "application/json"}
     
@@ -48,13 +48,10 @@ def update_readme(solved_list: list):
         with open(TARGET_FILE, 'r', encoding='utf-8') as f:
             readme_content = f.read()
 
-        # 푼 문제 목록을 데이터프레임으로 변환
+        # 👇👇👇 이 부분이 문제 목록을 표로 만드는 핵심입니다.
         df = pd.DataFrame({'Solved Problems': sorted(solved_list)})
-
-        # 데이터프레임을 마크다운 테이블로 변환
         markdown_table = df.to_markdown(index=False)
 
-        # README.md에서 주석 사이의 내용을 교체
         start_marker = ""
         end_marker = ""
 
@@ -64,19 +61,24 @@ def update_readme(solved_list: list):
         if start_index == -1 or end_index == -1:
             print(f"❌ '{TARGET_FILE}'에서 마커({start_marker}, {end_marker})를 찾을 수 없습니다.")
             return
-
+            
         new_content = (
             readme_content[:start_index + len(start_marker)] +
             "\n\n" +
-            markdown_table +
+            markdown_table +  # 👈 표 형식의 문자열로 교체
             "\n\n" +
             readme_content[end_index:]
         )
 
         with open(TARGET_FILE, 'w', encoding='utf-8') as f:
             f.write(new_content)
-
+            
         print(f"✅ '{TARGET_FILE}' 파일이 성공적으로 업데이트되었습니다.")
 
     except Exception as e:
         print(f"❌ 파일 업데이트 중 오류 발생: {e}")
+
+if __name__ == "__main__":
+    solved_problems = get_solved_problems_from_api(SOLVEDAC_ID)
+    if solved_problems:
+        update_readme(solved_problems)
