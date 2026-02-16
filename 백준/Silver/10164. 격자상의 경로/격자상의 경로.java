@@ -1,16 +1,6 @@
 import java.io.*;
 import java.util.*;
 
-class info{
-    int x;
-    int y;
-
-    info(int x, int y){
-        this.x = x;
-        this.y = y;
-    }
-}
-
 public class Main {
     static int graph[][];
 
@@ -44,7 +34,7 @@ public class Main {
 
             int sec = find(N - 1, M - 1);
 
-            bw.write(fir * sec);
+            bw.write((fir * sec) + "");
         }
 
         bw.flush();
@@ -53,15 +43,15 @@ public class Main {
     }
 
     static int find(int i, int j){
-        if(graph[i][j] == 0){
-            for(int t = 0; t < 2; t++){
+        if(graph[i][j] != 0) return graph[i][j];
+
+        for(int t = 0; t < 2; t++){
                 int x = i + dx[t];
                 int y = j + dy[t];
 
                 if(x < 0 || y < 0 || x >= N || y >= M) continue;
 
                 graph[i][j] += find(x, y);
-            }
         }
 
         return graph[i][j];
