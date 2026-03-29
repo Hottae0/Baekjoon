@@ -6,9 +6,9 @@ for i in range(N):
     age, name = input().split()
     age = int(age)
 
-    list.append( (age, name))
+    list.append( (age, i, name))
 
-list.sort(key = lambda x : x[0])
+list.sort()
 
 for i in list:
-    print(i[0], i[1])
+    print(i[0], i[2])
